@@ -1,10 +1,10 @@
 import submarineImage from '../image/submarino.png';
 import React, { useEffect, useState } from 'react';
 
-const Submarine = ({ isInBoard, onSelect }) => {
+const Submarine = ({ isSelected, onSelect }) => {
     return (
       <div>
-        {isInBoard ? (
+        {isSelected ? (
           <img className="ship-image" src={submarineImage} alt="Submarine" />
         ) : (
           <button onClick={onSelect}>Seleccionar Submarino</button>

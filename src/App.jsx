@@ -6,6 +6,7 @@ import GameInfo from './components/GameInfo';
 import ComputerPlayer from './components/ComputerPlayer';
 import PlayerStats from './components/PlayerStats';
 import Submarine from './components/Submarine';
+import Cruise from './components/Cruise';
 
 import './styles/styles.css';
 
@@ -168,8 +169,11 @@ const App = () => {
         <div className="ships-container">
           {/* Muestra los barcos al lado del tablero */}
           <Submarine 
-          isInBoard={selectedShip !== null}
+          isSelected={selectedShip !== null && selectedShip.name == 'submarine'}
           onSelect={() => setSelectedShip({ name: 'submarine', length: 4 })} />
+          <Cruise 
+          isSelected={selectedShip !== null && selectedShip.name == 'cruise'}
+          onSelect={() => setSelectedShip({ name: 'cruise', length: 4 })} />
         </div>
       </div>
       {/* ... (otros componentes y lógica) */}
