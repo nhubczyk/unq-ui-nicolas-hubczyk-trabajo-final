@@ -1,67 +1,107 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Board from './components/Board';
 import Cell from './components/Cell';
 import Ship from './components/Ship';
 import GameInfo from './components/GameInfo';
 import ComputerPlayer from './components/ComputerPlayer';
-import PlayerStats from './components/PlayerStats';  // Importa PlayerStats
+import PlayerStats from './components/PlayerStats';
+import Submarine from './components/Submarine';
 
 import './styles/styles.css';
 
 const App = () => {
   // Estado del juego
-  const [playerBoard, setPlayerBoard] = useState([
-    Array(10).fill(null).map(() => Array(10).fill("empty")),
-  ]);
+  const [playerBoard, setPlayerBoard] = useState([]);
 
-  const [computerBoard, setComputerBoard] = useState([
-    Array(10).fill(null).map(() => Array(10).fill("empty")),
-  ]);
+  const [computerBoard, setComputerBoard] = useState([]);
+
+  const [selectedShip, setSelectedShip] = useState(null);
+  
+  useEffect(() => {
+    setPlayerBoard(Array(10).fill(null).map(() => Array(10).fill("empty")));
+    setComputerBoard(Array(10).fill(null).map(() => Array(10).fill("empty")));
+  },[])
+  
 
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [gameOver, setGameOver] = useState(false);
   const [playerWins, setPlayerWins] = useState(0);
   const [computerWins, setComputerWins] = useState(0);
-
-  // Función para manejar el clic en una celda del jugador
-  const handlePlayerCellClick = (row, col) => {
-    // Verificar si el juego ya terminó
+  useEffect(() => {
     if (gameOver) {
       alert("El juego ya ha terminado. Reinicie para jugar de nuevo.");
-      return;
+  }},[gameOver])
+
+   // Función para manejar el clic en una celda del jugador durante la fase de selección de barcos
+   const shipSelectPosition = (row, col) => {
+    if (selectedShip) {
+      // Clonar el tablero para evitar mutar directamente el estado
+      const newPlayerBoard = [...playerBoard];
+
+      // Verificar si las celdas están disponibles para el submarino
+      const positionsOccupied = newPlayerBoard
+        .slice(row, row + selectedShip.length)
+        .every((r) => r[col] === "empty");
+
+      if (positionsOccupied && row + selectedShip.length <= 10) {
+        // Colocar el submarino en las posiciones
+        for (let i = 0; i < selectedShip.length; i++) {
+          newPlayerBoard[row + i][col] = selectedShip.name;
+        }
+
+        
+        // Restablecer el estado del submarino seleccionado
+        setSelectedShip(null);
+
+        // Actualizar el estado del tablero del jugador
+        setPlayerBoard(newPlayerBoard);
+
+        // Cambiar el turno
+        setIsPlayerTurn(false);
+
+        // Lógica adicional según sea necesario
+      } else {
+        // El usuario seleccionó una posición inválida para el submarino
+        alert("Posición inválida. Elija otra.");
+      }
     }
+  };
 
-    // Clonar el tablero para evitar mutar directamente el estado
-    const newPlayerBoard = [...playerBoard];
-
-    // Verificar si la celda ya ha sido seleccionada
-    if (newPlayerBoard[row][col] === "empty") {
-      // Marcar la celda como "ship" para indicar la posición del barco
-      newPlayerBoard[row][col] = "ship";
-    } else {
-      // El jugador seleccionó una celda ya seleccionada, no hacer nada
-      alert("Ya has seleccionado esta celda. Elige otra.");
-      return;
-    }
-
-    // Actualizar el estado del tablero del jugador
-    setPlayerBoard(newPlayerBoard);
-
-    // Verificar si la computadora ganó
-    if (checkGameOver(newPlayerBoard)) {
-      setGameOver(true);
-      alert("¡La computadora ganó! Reinicie para jugar de nuevo.");
-      setComputerWins(computerWins + 1);
-      return;
-    }
-
-    // Cambiar el turno
-    setIsPlayerTurn(false);
-
-    // Lógica adicional según sea necesario
-
-    // Puedes agregar más lógica para determinar si el juego ha terminado
-    // y actualizar el estado de gameOver en consecuencia (setGameOver(true))
+  //Funcion para que la computadora elija sus barcos.
+  const handleSelectShipPosition = () => {
+    const computerBoardCopy = [...computerBoard];
+  
+    const placeShip = (shipLength) => {
+      let shipPlaced = false;
+  
+      while (!shipPlaced) {
+        const randomRow = Math.floor(Math.random() * 10);
+        const randomCol = Math.floor(Math.random() * (10 - shipLength + 1));
+        
+        // Verificar si las posiciones están disponibles
+        const positionsOccupied = computerBoardCopy
+          .slice(randomRow, randomRow + shipLength)
+          .every((row) => row[randomCol] === "empty");
+  
+        if (positionsOccupied) {
+          // Colocar el barco en las posiciones
+          for (let i = 0; i < shipLength; i++) {
+            computerBoardCopy[randomRow + i][randomCol] = "ship";
+          }
+  
+          shipPlaced = true;
+        }
+      }
+    };
+  
+    // Colocar cada tipo de barco
+    placeShip(4); // Portaaviones
+    placeShip(4); // Crucero
+    placeShip(4); // Submarino
+    placeShip(2); // Lancha
+  
+    // Restablecer el estado del tablero de la computadora con los barcos colocados
+    setComputerBoard(computerBoardCopy);
   };
 
   // Función para manejar el turno de la computadora
@@ -121,7 +161,17 @@ const App = () => {
   return (
     <div>
       <h1>Juego de Batalla Naval</h1>
-      <Board board={playerBoard} onClick={handlePlayerCellClick} />
+      <div className="game-container">
+        <div className="board-container">
+          <Board board={playerBoard} onClick={shipSelectPosition} />
+        </div>
+        <div className="ships-container">
+          {/* Muestra los barcos al lado del tablero */}
+          <Submarine 
+          isInBoard={selectedShip !== null}
+          onSelect={() => setSelectedShip({ name: 'submarine', length: 4 })} />
+        </div>
+      </div>
       {/* ... (otros componentes y lógica) */}
       <ComputerPlayer computerBoard={computerBoard} isPlayerTurn={isPlayerTurn} onComputerTurn={handleComputerTurn} />
       {/* ... (otros componentes y lógica) */}

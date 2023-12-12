@@ -4,6 +4,11 @@
     grid-template-rows: repeat(10, 40px);
     gap: 4px;
   }
+
+.cell-ship-image {
+    z-index: 999;
+    position: absolute;
+}
   
 .cell {
     width: 40px;
@@ -15,13 +20,35 @@
     justify-content: center;
     cursor: pointer;
 }
-
-.ship-container {
-    position: absolute;
-}
   
-.ship {
+.ship, .submarine {
     width: 40px;
     height: 40px;
     background-color: blue;
 }
+
+.game-container {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+}
+  
+.board-container {
+    margin-right: 20px;
+}
+  
+.ships-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.ship-image {
+    height: 2em;
+    width: auto;
+}
+
+.ship-name {
+    font-size: 0.8em;
+    text-align: center;
+}
+
