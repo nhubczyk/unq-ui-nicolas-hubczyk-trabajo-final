@@ -6,7 +6,12 @@ const calculateShipImage = ( board, rowIndex, colIndex ) => {
   if (colIndex >= 0 && rowIndex >= 0 && board[rowIndex][colIndex] !== "empty"){
     const shipType = board[rowIndex][colIndex];
     if ( (rowIndex == 0 || board[rowIndex - 1][colIndex] !== shipType) && (colIndex == 0 || board[rowIndex][colIndex -1] !== shipType)){
-      return {height: 1, width: 4};
+      if (rowIndex + 1 <= 10 && board[rowIndex + 1][colIndex] === shipType) {
+        return {height: 1, width: 4};
+      }
+      else {
+        return {height: 4, width: 1 };
+      }
     }
   }
   return null;

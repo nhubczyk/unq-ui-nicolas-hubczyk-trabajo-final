@@ -27,6 +27,14 @@
     background-color: blue;
 }
 
+.red {
+    background-color: red;
+}
+
+.blue {
+    background-color: blue;
+}
+
 .game-container {
     display: flex;
     justify-content: space-between;

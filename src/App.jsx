@@ -7,20 +7,23 @@ import ComputerPlayer from './components/ComputerPlayer';
 import PlayerStats from './components/PlayerStats';
 import Submarine from './components/Submarine';
 import Cruise from './components/Cruise';
-
+import AircraftCarrier from './components/AircraftCarrier';
+import TorpedoBoat from './components/TorpedoBoat';
 import './styles/styles.css';
+import BoardComputer from './components/BoardComputer';
 
 const App = () => {
   // Estado del juego
   const [playerBoard, setPlayerBoard] = useState([]);
-
   const [computerBoard, setComputerBoard] = useState([]);
-
   const [selectedShip, setSelectedShip] = useState(null);
+  const [selectedOrientation, setSelectedOrientation] = useState('horizontal');
+  const [playerGuessBoard, setPlayerGuessBoard] = useState([]);
   
   useEffect(() => {
     setPlayerBoard(Array(10).fill(null).map(() => Array(10).fill("empty")));
     setComputerBoard(Array(10).fill(null).map(() => Array(10).fill("empty")));
+    setPlayerGuessBoard(Array(10).fill(null).map(() => Array(10).fill("empty")));
   },[])
   
 
@@ -33,38 +36,50 @@ const App = () => {
       alert("El juego ya ha terminado. Reinicie para jugar de nuevo.");
   }},[gameOver])
 
+  const handleClick = (rowIndex, colIndex) => {
+    const newPlayerGuessBoard = [...playerGuessBoard];
+    if (playerGuessBoard[rowIndex][colIndex] === 'empty') {
+      if (computerBoard[rowIndex][colIndex] !== "empty") {
+        newPlayerGuessBoard[rowIndex][colIndex] = 'red'; 
+      }
+      else {
+        newPlayerGuessBoard[rowIndex][colIndex] = 'blue'; 
+      }
+      setPlayerGuessBoard(newPlayerGuessBoard)
+    } else {
+      alert("Ya hiciste click en esta celda");
+    }
+  };
+
    // Función para manejar el clic en una celda del jugador durante la fase de selección de barcos
    const shipSelectPosition = (row, col) => {
     if (selectedShip) {
-      // Clonar el tablero para evitar mutar directamente el estado
       const newPlayerBoard = [...playerBoard];
+      const positionsOccupied = calculatePositionsOccupied(newPlayerBoard, row, col, selectedShip.length, selectedOrientation);
 
-      // Verificar si las celdas están disponibles para el submarino
-      const positionsOccupied = newPlayerBoard
-        .slice(row, row + selectedShip.length)
-        .every((r) => r[col] === "empty");
-
-      if (positionsOccupied && row + selectedShip.length <= 10) {
-        // Colocar el submarino en las posiciones
+      if (("vertical" == selectedOrientation && positionsOccupied && row + selectedShip.length < 10) 
+            || ("horizontal" == selectedOrientation && positionsOccupied && col + selectedShip.length < 10)) {
         for (let i = 0; i < selectedShip.length; i++) {
-          newPlayerBoard[row + i][col] = selectedShip.name;
+          if (selectedOrientation === 'vertical') {
+            newPlayerBoard[row][col + i] = selectedShip.name;
+          } else {
+            newPlayerBoard[row + i][col] = selectedShip.name;
+          }
         }
-
-        
-        // Restablecer el estado del submarino seleccionado
         setSelectedShip(null);
-
-        // Actualizar el estado del tablero del jugador
         setPlayerBoard(newPlayerBoard);
-
-        // Cambiar el turno
         setIsPlayerTurn(false);
-
-        // Lógica adicional según sea necesario
       } else {
-        // El usuario seleccionó una posición inválida para el submarino
         alert("Posición inválida. Elija otra.");
       }
+    }
+  };
+
+  const calculatePositionsOccupied = (board, row, col, length, orientation) => {
+    if (orientation === 'vertical') {
+      return board[row].slice(col, col + length).every((c) => c === 'empty')
+    }else {
+      return board.slice(row, row + length).every((r) => r[col] === 'empty')
     }
   };
 
@@ -151,10 +166,9 @@ const App = () => {
 
   // Función para iniciar un nuevo juego
   const startNewGame = () => {
-    // Lógica para reiniciar el estado del juego
-    // Puedes reiniciar el estado del tablero del jugador y la computadora aquí
     setPlayerBoard(Array(10).fill(null).map(() => Array(10).fill("empty")));
     setComputerBoard(Array(10).fill(null).map(() => Array(10).fill("empty")));
+    handleSelectShipPosition();
     setIsPlayerTurn(true);
     setGameOver(false);
   };
@@ -174,8 +188,28 @@ const App = () => {
           <Cruise 
           isSelected={selectedShip !== null && selectedShip.name == 'cruise'}
           onSelect={() => setSelectedShip({ name: 'cruise', length: 4 })} />
+          <AircraftCarrier
+          isSelected={selectedShip !== null && selectedShip.name == 'aircraftcarrier'}
+          onSelect={() => setSelectedShip({ name: 'aircraftcarrier', length: 4 })} />
+          <TorpedoBoat
+          isSelected={selectedShip !== null && selectedShip.name == 'torpedoboat'}
+          onSelect={() => setSelectedShip({ name: 'torpedoboat', length: 2 })} />
         </div>
+        <div>
+            <label>Orientación:</label>
+            <select
+              value={selectedOrientation}
+              onChange={(e) => setSelectedOrientation(e.target.value)}
+            >
+              <option value="horizontal">Horizontal</option>
+              <option value="vertical">Vertical</option>
+            </select>
+          </div>
+          <div className="board-container">
+            <BoardComputer boardComputer={playerGuessBoard} onClick={handleClick} />
+          </div>
       </div>
+      <div>
       {/* ... (otros componentes y lógica) */}
       <ComputerPlayer computerBoard={computerBoard} isPlayerTurn={isPlayerTurn} onComputerTurn={handleComputerTurn} />
       {/* ... (otros componentes y lógica) */}
@@ -183,6 +217,7 @@ const App = () => {
       <PlayerStats wins={computerWins} />
       <button onClick={startNewGame}>Reiniciar Juego</button>
     </div>
+  </div>
   );
 };
 
