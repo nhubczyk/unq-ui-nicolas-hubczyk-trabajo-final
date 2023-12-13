@@ -19,11 +19,13 @@ const App = () => {
   const [selectedShip, setSelectedShip] = useState(null);
   const [selectedOrientation, setSelectedOrientation] = useState('horizontal');
   const [playerGuessBoard, setPlayerGuessBoard] = useState([]);
+  const [computerGuessBoard, setComputerGuessBoard] = useState([]);
   
   useEffect(() => {
     setPlayerBoard(Array(10).fill(null).map(() => Array(10).fill("empty")));
     setComputerBoard(Array(10).fill(null).map(() => Array(10).fill("empty")));
     setPlayerGuessBoard(Array(10).fill(null).map(() => Array(10).fill("empty")));
+    setComputerGuessBoard(Array(10).fill(null).map(() => Array(10).fill("empty")));
   },[])
   
 
@@ -38,18 +40,32 @@ const App = () => {
 
   const handleClick = (rowIndex, colIndex) => {
     const newPlayerGuessBoard = [...playerGuessBoard];
+  
     if (playerGuessBoard[rowIndex][colIndex] === 'empty') {
-      if (computerBoard[rowIndex][colIndex] !== "empty") {
-        newPlayerGuessBoard[rowIndex][colIndex] = 'red'; 
+      if (computerBoard[rowIndex][colIndex] !== 'empty') {
+        newPlayerGuessBoard[rowIndex][colIndex] = 'red';
+      } else {
+        newPlayerGuessBoard[rowIndex][colIndex] = 'blue';
       }
-      else {
-        newPlayerGuessBoard[rowIndex][colIndex] = 'blue'; 
-      }
-      setPlayerGuessBoard(newPlayerGuessBoard)
+      setPlayerGuessBoard(newPlayerGuessBoard);
     } else {
       alert("Ya hiciste click en esta celda");
     }
+
+    if (checkGameOver(newPlayerGuessBoard)) {
+      setGameOver(true);
+      alert("¡Ganaste el juego! Reinicie para jugar de nuevo.");
+      setPlayerWins(playerWins + 1);
+      return;
+    }
+    setIsPlayerTurn(false);
   };
+
+  useEffect(() => {
+    if (!isPlayerTurn) {
+      handleComputerTurn();
+  }},[isPlayerTurn])
+
 
    // Función para manejar el clic en una celda del jugador durante la fase de selección de barcos
    const shipSelectPosition = (row, col) => {
@@ -84,41 +100,52 @@ const App = () => {
   };
 
   //Funcion para que la computadora elija sus barcos.
-  const handleSelectShipPosition = () => {
-    const computerBoardCopy = [...computerBoard];
-  
-    const placeShip = (shipLength) => {
-      let shipPlaced = false;
-  
-      while (!shipPlaced) {
-        const randomRow = Math.floor(Math.random() * 10);
-        const randomCol = Math.floor(Math.random() * (10 - shipLength + 1));
-        
-        // Verificar si las posiciones están disponibles
-        const positionsOccupied = computerBoardCopy
-          .slice(randomRow, randomRow + shipLength)
-          .every((row) => row[randomCol] === "empty");
-  
-        if (positionsOccupied) {
-          // Colocar el barco en las posiciones
-          for (let i = 0; i < shipLength; i++) {
-            computerBoardCopy[randomRow + i][randomCol] = "ship";
-          }
-  
-          shipPlaced = true;
-        }
+  // Funcion para que la computadora elija sus barcos.
+const handleSelectShipPosition = () => {
+  const computerBoardCopy = Array(10).fill(null).map(() => Array(10).fill("empty"));
+
+  const placeShip = (shipLength) => {
+    let shipPlaced = false;
+
+    while (!shipPlaced) {
+      const isHorizontal = Math.random() > 0.5;
+      var randomRow = 0;
+      var randomCol = 0;
+      if (isHorizontal) {
+        randomCol = Math.floor(Math.random() * (10 - shipLength + 1));
+        randomRow = Math.floor(Math.random() * 10);
+      }else {
+        randomCol = Math.floor(Math.random() * 10);
+        randomRow = Math.floor(Math.random() * (10 - shipLength + 1));
       }
-    };
-  
-    // Colocar cada tipo de barco
-    placeShip(4); // Portaaviones
-    placeShip(4); // Crucero
-    placeShip(4); // Submarino
-    placeShip(2); // Lancha
-  
-    // Restablecer el estado del tablero de la computadora con los barcos colocados
-    setComputerBoard(computerBoardCopy);
+
+      const orientacion = isHorizontal ? "horizontal" : "vertical";
+      const positionsOccupied = calculatePositionsOccupied(computerBoardCopy, randomRow, randomCol, shipLength, orientacion);
+      if (positionsOccupied) {
+        // Colocar el barco en las posiciones
+        for (let i = 0; i < shipLength; i++) {
+          if (!isHorizontal) {
+            computerBoardCopy[randomRow + i][randomCol] = "ship";
+          }else {
+            computerBoardCopy[randomRow][randomCol + i] = "ship";
+          }
+        }
+        shipPlaced = true;
+      }
+    }
   };
+
+  // Colocar cada tipo de barco
+  placeShip(4); // Portaaviones
+  placeShip(4); // Crucero
+  placeShip(4); // Submarino
+  placeShip(2); // Lancha
+
+  // Restablecer el estado del tablero de la computadora con los barcos colocados
+  setComputerBoard(computerBoardCopy);
+};
+
+
 
   // Función para manejar el turno de la computadora
   const handleComputerTurn = () => {
@@ -130,18 +157,18 @@ const App = () => {
       do {
         randomRow = Math.floor(Math.random() * 10);
         randomCol = Math.floor(Math.random() * 10);
-      } while (computerBoard[randomRow][randomCol] !== "empty");
+      } while (playerBoard[randomRow][randomCol] !== "empty");
 
       // Marcar la celda como seleccionada por la computadora
-      const newComputerBoard = [...computerBoard];
+      const newComputerBoard = [...computerGuessBoard];
       newComputerBoard[randomRow][randomCol] = "selected";  // Puedes usar un valor diferente si lo prefieres
-      setComputerBoard(newComputerBoard);
+      setComputerGuessBoard(newComputerBoard);
 
       // Verificar si el jugador ganó
       if (checkGameOver(newComputerBoard)) {
         setGameOver(true);
-        alert("¡Has ganado! Reinicie para jugar de nuevo.");
-        setPlayerWins(playerWins + 1);
+        alert("¡Gano la computadora! Reinicie para jugar de nuevo.");
+        setComputerWins(computerWins + 1);
         return;
       }
 
@@ -173,12 +200,16 @@ const App = () => {
     setGameOver(false);
   };
 
+  useEffect(() => {
+    handleSelectShipPosition();
+  },[])
+
   return (
     <div>
       <h1>Juego de Batalla Naval</h1>
       <div className="game-container">
         <div className="board-container">
-          <Board board={playerBoard} onClick={shipSelectPosition} />
+          <Board board={playerBoard} computerBoard={computerGuessBoard} onClick={shipSelectPosition} />
         </div>
         <div className="ships-container">
           {/* Muestra los barcos al lado del tablero */}
@@ -213,8 +244,15 @@ const App = () => {
       {/* ... (otros componentes y lógica) */}
       <ComputerPlayer computerBoard={computerBoard} isPlayerTurn={isPlayerTurn} onComputerTurn={handleComputerTurn} />
       {/* ... (otros componentes y lógica) */}
-      <PlayerStats wins={playerWins} />
-      <PlayerStats wins={computerWins} />
+      <div>
+        <PlayerStats wins={playerWins} />
+        <PlayerStats wins={computerWins} />
+      {gameOver && (
+        <div>
+          <h2>{winner} ganó la partida</h2>
+        </div>
+      )}
+    </div>
       <button onClick={startNewGame}>Reiniciar Juego</button>
     </div>
   </div>

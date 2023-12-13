@@ -17,7 +17,7 @@ const calculateShipImage = ( board, rowIndex, colIndex ) => {
   return null;
 };
 
-const Board = ({ board, onClick }) => {
+const Board = ({ board, computerBoard, onClick }) => {
   return (
     <div className="board">
       {board.map((row, rowIndex) => (
@@ -26,6 +26,7 @@ const Board = ({ board, onClick }) => {
             <Cell
               key={`${rowIndex}-${colIndex}`}
               value={cellValue}
+              computerValue={computerBoard[rowIndex][colIndex]}
               onClick={() => onClick(rowIndex, colIndex)}
               headShip={calculateShipImage(board, rowIndex, colIndex)}
             >

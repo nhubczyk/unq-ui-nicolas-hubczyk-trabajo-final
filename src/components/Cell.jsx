@@ -4,7 +4,7 @@ import cruiseImage from '../image/imagenCruzero.png';
 import aircraftCarrierImage from '../image/portaAviones.png';
 import torpedoBoatImage from '../image/lanchaDeTorpedos.png';
 
-const Cell = ({ value, onClick, headShip}) => {
+const Cell = ({ value, computerValue, onClick, headShip}) => {
   const [ship, setShip] = useState(null);
   const [isVertical, setIsVertical] = useState(null);
   const shipImageDictionary = {
@@ -22,7 +22,7 @@ const Cell = ({ value, onClick, headShip}) => {
   },[headShip])
 
   return (
-    <div className={`cell ${value}`} onClick={onClick}>
+    <div className={`cell ${computerValue}`} onClick={onClick}>
       {ship && <img style={{height: isVertical ? 41.5: 40, width: isVertical ? ship.height * 41.5: ship.width * 44, marginLeft: ! (isVertical) && ship.width * 33, marginTop: isVertical && ship.height * 31.5, transform: isVertical && "rotate(90deg)"}} 
           src={shipImageDictionary[value]} alt={value} className="cell-ship-image"/>}
     </div>

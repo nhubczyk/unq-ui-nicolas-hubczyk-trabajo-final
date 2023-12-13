@@ -3,7 +3,6 @@ import Cell from './Cell';
 import Ship from './Ship';
 
 const BoardComputer = ({ boardComputer, onClick }) => {
-
   return (
     <div className="board">
       {boardComputer.map((row, rowIndex) => (
