@@ -21,10 +21,10 @@
     cursor: pointer;
 }
   
-.ship, .submarine {
+.ship, .submarine, .cruise, .aircraftcarrier, .torpedoboat{
     width: 40px;
     height: 40px;
-    background-color: blue;
+    background-color: green;
 }
 
 .red   {

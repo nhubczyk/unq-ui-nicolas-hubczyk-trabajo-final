@@ -20,6 +20,8 @@ const App = () => {
   const [selectedOrientation, setSelectedOrientation] = useState('horizontal');
   const [playerGuessBoard, setPlayerGuessBoard] = useState([]);
   const [computerGuessBoard, setComputerGuessBoard] = useState([]);
+  const [points, setPoints] = useState(0);
+  const [pointsComputer, setPointsComputer] = useState(0);
   
   useEffect(() => {
     setPlayerBoard(Array(10).fill(null).map(() => Array(10).fill("empty")));
@@ -44,6 +46,7 @@ const App = () => {
     if (playerGuessBoard[rowIndex][colIndex] === 'empty') {
       if (computerBoard[rowIndex][colIndex] !== 'empty') {
         newPlayerGuessBoard[rowIndex][colIndex] = 'red';
+        setPoints(points + 1);
       } else {
         newPlayerGuessBoard[rowIndex][colIndex] = 'blue';
       }
@@ -52,12 +55,6 @@ const App = () => {
       alert("Ya hiciste click en esta celda");
     }
 
-    if (checkGameOver(newPlayerGuessBoard)) {
-      setGameOver(true);
-      alert("¡Ganaste el juego! Reinicie para jugar de nuevo.");
-      setPlayerWins(playerWins + 1);
-      return;
-    }
     setIsPlayerTurn(false);
   };
 
@@ -144,7 +141,23 @@ const handleSelectShipPosition = () => {
   setComputerBoard(computerBoardCopy);
 };
 
+  useEffect(() => {
+    if (pointsComputer >= 14) {
+        setGameOver(true);
+        alert("¡Gano la computadora! Reinicie para jugar de nuevo.");
+        setComputerWins(computerWins + 1);
+        return;
+    }
+    },[pointsComputer])
 
+    useEffect(() => {
+      if (points >= 14) {
+        setGameOver(true);
+        alert("¡Ganaste el juego! Reinicie para jugar de nuevo.");
+        setPlayerWins(playerWins + 1);
+        return;
+      }
+    },[points])
 
   // Función para manejar el turno de la computadora
   const handleComputerTurn = () => {
@@ -165,17 +178,10 @@ const handleSelectShipPosition = () => {
       }
       else {
         newComputerBoard[randomRow][randomCol] = "red";
+        setPointsComputer(pointsComputer + 1);
       }
       // Puedes usar un valor diferente si lo prefieres
       setComputerGuessBoard(newComputerBoard);
-
-      // Verificar si el jugador ganó
-      if (checkGameOver(newComputerBoard)) {
-        setGameOver(true);
-        alert("¡Gano la computadora! Reinicie para jugar de nuevo.");
-        setComputerWins(computerWins + 1);
-        return;
-      }
 
       // Cambiar el turno
       setIsPlayerTurn(true);
@@ -185,15 +191,6 @@ const handleSelectShipPosition = () => {
       // Puedes agregar más lógica para determinar si el juego ha terminado
       // y actualizar el estado de gameOver en consecuencia (setGameOver(true))
     }
-  };
-
-  // Función para verificar si el juego ha terminado
-  const checkGameOver = (board) => {
-    // Implementa la lógica para verificar si el juego ha terminado
-    // Por ejemplo, puedes verificar si todos los barcos han sido hundidos
-    // o si se cumplen otras condiciones específicas del juego
-    // Retorna true si el juego ha terminado, false de lo contrario
-    return false;  // Debes ajustar esto según la lógica específica del juego
   };
 
   // Función para iniciar un nuevo juego
@@ -251,8 +248,8 @@ const handleSelectShipPosition = () => {
       {/* ... (otros componentes y lógica) */}
       {/* <ComputerPlayer computerBoard={computerBoard} isPlayerTurn={isPlayerTurn} onComputerTurn={handleComputerTurn} /> }
       {/* ... (otros componentes y lógica) */}
-      <PlayerStats wins={playerWins} />
-      <PlayerStats wins={computerWins} />
+      <PlayerStats wins={playerWins} texto={"Victorias del jugador"} />
+      <PlayerStats wins={computerWins} texto={"Victorias de la computadora"}/>
       <button onClick={startNewGame}>Reiniciar Juego</button>
     </div>
   </div>
