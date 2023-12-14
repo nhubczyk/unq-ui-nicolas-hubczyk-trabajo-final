@@ -10,7 +10,7 @@ const BoardComputer = ({ boardComputer, onClick }) => {
           {row.map((cellValue, colIndex) => (
             <Cell
               key={`${rowIndex}-${colIndex}`}
-              value={cellValue}
+              computerValue={cellValue}
               onClick={() => onClick(rowIndex, colIndex)}
             >
               {cellValue === 'ship' && (

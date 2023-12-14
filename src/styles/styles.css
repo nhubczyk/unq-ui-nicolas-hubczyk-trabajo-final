@@ -6,7 +6,7 @@
   }
 
 .cell-ship-image {
-    z-index: 999;
+    z-index: 555;
     position: absolute;
 }
   
@@ -27,7 +27,7 @@
     background-color: blue;
 }
 
-.red {
+.red   {
     background-color: red;
 }
 

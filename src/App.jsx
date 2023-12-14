@@ -84,7 +84,6 @@ const App = () => {
         }
         setSelectedShip(null);
         setPlayerBoard(newPlayerBoard);
-        setIsPlayerTurn(false);
       } else {
         alert("Posición inválida. Elija otra.");
       }
@@ -92,7 +91,7 @@ const App = () => {
   };
 
   const calculatePositionsOccupied = (board, row, col, length, orientation) => {
-    if (orientation === 'vertical') {
+    if (orientation !== 'vertical') {
       return board[row].slice(col, col + length).every((c) => c === 'empty')
     }else {
       return board.slice(row, row + length).every((r) => r[col] === 'empty')
@@ -157,11 +156,17 @@ const handleSelectShipPosition = () => {
       do {
         randomRow = Math.floor(Math.random() * 10);
         randomCol = Math.floor(Math.random() * 10);
-      } while (playerBoard[randomRow][randomCol] !== "empty");
+      } while (computerGuessBoard[randomRow][randomCol] !== "empty");
 
-      // Marcar la celda como seleccionada por la computadora
       const newComputerBoard = [...computerGuessBoard];
-      newComputerBoard[randomRow][randomCol] = "selected";  // Puedes usar un valor diferente si lo prefieres
+      // Marcar la celda como seleccionada por la computadora
+      if (playerBoard[randomRow][randomCol] === "empty") {
+        newComputerBoard[randomRow][randomCol] = "blue";
+      }
+      else {
+        newComputerBoard[randomRow][randomCol] = "red";
+      }
+      // Puedes usar un valor diferente si lo prefieres
       setComputerGuessBoard(newComputerBoard);
 
       // Verificar si el jugador ganó
@@ -195,6 +200,8 @@ const handleSelectShipPosition = () => {
   const startNewGame = () => {
     setPlayerBoard(Array(10).fill(null).map(() => Array(10).fill("empty")));
     setComputerBoard(Array(10).fill(null).map(() => Array(10).fill("empty")));
+    setPlayerGuessBoard(Array(10).fill(null).map(() => Array(10).fill("empty")));
+    setComputerGuessBoard(Array(10).fill(null).map(() => Array(10).fill("empty")));
     handleSelectShipPosition();
     setIsPlayerTurn(true);
     setGameOver(false);
@@ -237,22 +244,15 @@ const handleSelectShipPosition = () => {
             </select>
           </div>
           <div className="board-container">
-            <BoardComputer boardComputer={playerGuessBoard} onClick={handleClick} />
+            {playerGuessBoard && <BoardComputer boardComputer={playerGuessBoard} onClick={handleClick} />}
           </div>
       </div>
       <div>
       {/* ... (otros componentes y lógica) */}
-      <ComputerPlayer computerBoard={computerBoard} isPlayerTurn={isPlayerTurn} onComputerTurn={handleComputerTurn} />
+      {/* <ComputerPlayer computerBoard={computerBoard} isPlayerTurn={isPlayerTurn} onComputerTurn={handleComputerTurn} /> }
       {/* ... (otros componentes y lógica) */}
-      <div>
-        <PlayerStats wins={playerWins} />
-        <PlayerStats wins={computerWins} />
-      {gameOver && (
-        <div>
-          <h2>{winner} ganó la partida</h2>
-        </div>
-      )}
-    </div>
+      <PlayerStats wins={playerWins} />
+      <PlayerStats wins={computerWins} />
       <button onClick={startNewGame}>Reiniciar Juego</button>
     </div>
   </div>

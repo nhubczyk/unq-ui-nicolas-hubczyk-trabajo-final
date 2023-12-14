@@ -23,8 +23,8 @@ const Cell = ({ value, computerValue, onClick, headShip}) => {
 
   return (
     <div className={`cell ${computerValue}`} onClick={onClick}>
-      {ship && <img style={{height: isVertical ? 41.5: 40, width: isVertical ? ship.height * 41.5: ship.width * 44, marginLeft: ! (isVertical) && ship.width * 33, marginTop: isVertical && ship.height * 31.5, transform: isVertical && "rotate(90deg)"}} 
-          src={shipImageDictionary[value]} alt={value} className="cell-ship-image"/>}
+      {/* {ship && <img style={{height: isVertical ? 41.5: 40, width: isVertical ? ship.height * 41.5: ship.width * 44, marginLeft: ! (isVertical) && ship.width * 33, marginTop: isVertical && ship.height * 31.5, transform: isVertical && "rotate(90deg)"}} 
+          src={shipImageDictionary[value]} alt={value} className="cell-ship-image"/>} */}
     </div>
   );
 };
