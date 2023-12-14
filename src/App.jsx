@@ -95,8 +95,7 @@ const App = () => {
     }
   };
 
-  //Funcion para que la computadora elija sus barcos.
-  // Funcion para que la computadora elija sus barcos.
+// Funcion para que la computadora elija sus barcos.
 const handleSelectShipPosition = () => {
   const computerBoardCopy = Array(10).fill(null).map(() => Array(10).fill("empty"));
 
@@ -161,7 +160,6 @@ const handleSelectShipPosition = () => {
 
   // Función para manejar el turno de la computadora
   const handleComputerTurn = () => {
-    // Lógica para que la computadora realice movimientos aleatorios y evite lugares ya seleccionados
     if (!gameOver && !isPlayerTurn) {
       let randomRow, randomCol;
 
@@ -172,7 +170,6 @@ const handleSelectShipPosition = () => {
       } while (computerGuessBoard[randomRow][randomCol] !== "empty");
 
       const newComputerBoard = [...computerGuessBoard];
-      // Marcar la celda como seleccionada por la computadora
       if (playerBoard[randomRow][randomCol] === "empty") {
         newComputerBoard[randomRow][randomCol] = "blue";
       }
@@ -180,16 +177,9 @@ const handleSelectShipPosition = () => {
         newComputerBoard[randomRow][randomCol] = "red";
         setPointsComputer(pointsComputer + 1);
       }
-      // Puedes usar un valor diferente si lo prefieres
       setComputerGuessBoard(newComputerBoard);
 
-      // Cambiar el turno
       setIsPlayerTurn(true);
-
-      // Puedes agregar más lógica según sea necesario
-
-      // Puedes agregar más lógica para determinar si el juego ha terminado
-      // y actualizar el estado de gameOver en consecuencia (setGameOver(true))
     }
   };
 
@@ -210,7 +200,7 @@ const handleSelectShipPosition = () => {
 
   return (
     <div>
-      <h1>Juego de Batalla Naval</h1>
+      <h1 className='title-name'>Juego de Batalla Naval</h1>
       <div className="game-container">
         <div className="board-container">
           <Board board={playerBoard} computerBoard={computerGuessBoard} onClick={shipSelectPosition} />
@@ -245,12 +235,13 @@ const handleSelectShipPosition = () => {
           </div>
       </div>
       <div>
-      {/* ... (otros componentes y lógica) */}
-      {/* <ComputerPlayer computerBoard={computerBoard} isPlayerTurn={isPlayerTurn} onComputerTurn={handleComputerTurn} /> }
-      {/* ... (otros componentes y lógica) */}
-      <PlayerStats wins={playerWins} texto={"Victorias del jugador"} />
-      <PlayerStats wins={computerWins} texto={"Victorias de la computadora"}/>
-      <button onClick={startNewGame}>Reiniciar Juego</button>
+      <div className="player-stats-container">
+        <PlayerStats wins={playerWins} texto={"Victorias del jugador"} />
+        <PlayerStats wins={computerWins} texto={"Victorias de la computadora"}/>
+      </div>
+      <div className="restart-button-container">
+        <button onClick={startNewGame}>Reiniciar Juego</button>
+      </div>
     </div>
   </div>
   );

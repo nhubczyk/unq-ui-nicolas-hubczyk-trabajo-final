@@ -1,3 +1,7 @@
+body {
+    background-color: cadetblue;
+}
+
 .board {
     display: grid;
     grid-template-columns: repeat(10, 40px);
@@ -9,6 +13,32 @@
     z-index: 555;
     position: absolute;
 }
+
+.player-stats-container {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+  }
+  
+
+  .player-stats {
+    text-align: center; 
+    margin-right: 10px; 
+  }
+  
+.restart-button-container {
+    text-align: center;
+    margin-top: 20px; 
+  }
+  
+  .restart-button-text {
+    font-weight: bold; 
+  }
+  
+
+  .player-stats-text {
+    font-weight: bold; 
+  }
   
 .cell {
     width: 40px;
@@ -19,6 +49,10 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+}
+
+.title-name {
+    text-align: center;
 }
   
 .ship, .submarine, .cruise, .aircraftcarrier, .torpedoboat{
